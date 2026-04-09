@@ -1,670 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camping El Ceibo - Gestión</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2e7d32; margin-bottom: 5px; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; color: #333; }
+        .section { margin-bottom: 25px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        button { background-color: #2e7d32; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:active { background-color: #1b5e20; }
+        .resumen { background: #e8f5e9; padding: 15px; border-radius: 8px; }
+        .log-entry { font-size: 14px; border-bottom: 1px solid #ddd; padding: 5px 0; }
+        .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --forest: #2d5a27; --forest-light: #3d7a35; --forest-pale: #eaf3de;
-    --water: #1a6b9a; --water-light: #378add; --water-pale: #e6f1fb;
-    --wood: #8b5e3c; --wood-light: #b07d4e; --wood-pale: #faeeda;
-    --sand: #f5f0e8;
-  }
-  body { font-family: var(--font-sans, system-ui); background: var(--color-background-tertiary, #f5f5f2); }
-  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
-  .header { background: var(--forest); color: white; padding: 14px 16px 10px; display: flex; align-items: center; justify-content: space-between; }
-  .header-title { font-size: 15px; font-weight: 500; }
-  .header-sub { font-size: 11px; opacity: 0.75; }
-  .header-date { font-size: 12px; opacity: 0.8; text-align: right; }
-  .nav { background: var(--forest-light); display: flex; overflow-x: auto; scrollbar-width: none; }
-  .nav::-webkit-scrollbar { display: none; }
-  .nav-btn { flex-shrink: 0; padding: 10px 14px; color: rgba(255,255,255,0.7); font-size: 12px; cursor: pointer; border: none; background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.2s; }
-  .nav-btn.active { color: white; border-bottom: 2px solid #fac775; }
-  .nav-btn svg { width: 18px; height: 18px; }
-  .content { flex: 1; padding: 14px; display: none; }
-  .content.active { display: block; }
-  .section-title { font-size: 13px; font-weight: 500; color: var(--forest); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-  .card { background: var(--color-background-primary, white); border-radius: 12px; border: 0.5px solid var(--color-border-tertiary, #e0e0e0); padding: 14px; margin-bottom: 12px; }
-  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  .metric { background: var(--color-background-secondary, #f8f8f6); border-radius: 8px; padding: 12px; }
-  .metric-label { font-size: 11px; color: var(--color-text-secondary, #666); margin-bottom: 4px; }
-  .metric-val { font-size: 22px; font-weight: 500; }
-  .metric-val.green { color: var(--forest); }
-  .metric-val.blue { color: var(--water); }
-  .metric-val.amber { color: #ba7517; }
-  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
-  .badge.ok { background: #eaf3de; color: #27500a; }
-  .badge.warn { background: #faeeda; color: #633806; }
-  .badge.danger { background: #fcebeb; color: #791f1f; }
-  .alert-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary, #e8e8e8); }
-  .alert-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .alert-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .alert-icon.warn { background: #faeeda; }
-  .alert-icon.ok { background: #eaf3de; }
-  .alert-text { flex: 1; font-size: 13px; }
-  .alert-text small { font-size: 11px; color: var(--color-text-secondary, #888); }
-  .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .slot { border-radius: 10px; padding: 10px; cursor: pointer; border: 1.5px solid; transition: all 0.15s; }
-  .slot.libre { background: #eaf3de; border-color: #97c459; }
-  .slot.ocupado { background: #e6f1fb; border-color: #85b7eb; }
-  .slot.seleccionado { border-color: var(--forest); box-shadow: 0 0 0 2px rgba(45,90,39,0.2); }
-  .slot-name { font-size: 13px; font-weight: 500; }
-  .slot-info { font-size: 11px; color: var(--color-text-secondary, #666); margin-top: 2px; }
-  .slot-price { font-size: 12px; font-weight: 500; color: var(--water); margin-top: 4px; }
-  .form-row { margin-bottom: 10px; }
-  .form-label { font-size: 12px; color: var(--color-text-secondary, #666); margin-bottom: 4px; display: block; }
-  .form-input, .form-select { width: 100%; padding: 8px 10px; border-radius: 8px; border: 0.5px solid var(--color-border-tertiary, #ddd); font-size: 13px; background: var(--color-background-primary, white); color: var(--color-text-primary, #222); }
-  .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
-  .btn-primary { background: var(--forest); color: white; width: 100%; }
-  .btn-primary:hover { background: var(--forest-light); }
-  .btn-sm { padding: 6px 12px; font-size: 12px; }
-  .btn-water { background: var(--water); color: white; }
-  .btn-wood { background: var(--wood); color: white; }
-  .btn-danger { background: #e24b4a; color: white; }
-  .btn-outline { background: none; border: 0.5px solid var(--color-border-tertiary, #ddd); color: var(--color-text-primary, #333); }
-  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-  .tag { padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid; transition: all 0.15s; }
-  .tag.active { background: var(--forest); color: white; border-color: var(--forest); }
-  .tag.inactive { background: var(--color-background-primary, white); color: var(--forest); border-color: var(--forest); }
-  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .cal-head { font-size: 10px; text-align: center; color: var(--color-text-secondary, #888); padding: 4px 0; }
-  .cal-day { aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
-  .cal-day.empty { background: none; cursor: default; }
-  .cal-day.today { background: var(--forest); color: white; }
-  .cal-day.reservado { background: #e6f1fb; border-color: #85b7eb; color: var(--water); }
-  .cal-day.disponible { background: var(--color-background-secondary, #f5f5f2); color: var(--color-text-primary, #333); }
-  .cal-day.disponible:hover { background: var(--forest-pale); border-color: var(--forest); }
-  .reserva-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid var(--color-border-tertiary, #eee); font-size: 13px; }
-  .reserva-item:last-child { border-bottom: none; }
-  .mov-list { }
-  .mov-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid var(--color-border-tertiary, #eee); }
-  .mov-item:last-child { border-bottom: none; }
-  .mov-left { display: flex; align-items: center; gap: 10px; }
-  .mov-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-  .mov-icon.ingreso { background: #eaf3de; }
-  .mov-icon.egreso { background: #fcebeb; }
-  .mov-desc { font-size: 13px; }
-  .mov-cat { font-size: 11px; color: var(--color-text-secondary, #888); }
-  .mov-amount { font-size: 13px; font-weight: 500; }
-  .mov-amount.ingreso { color: var(--forest); }
-  .mov-amount.egreso { color: #a32d2d; }
-  .chart-wrap { position: relative; width: 100%; height: 200px; margin: 10px 0; }
-  .export-btn { background: #25d366; color: white; border: none; border-radius: 10px; padding: 12px; width: 100%; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .tipo-tag { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; }
-  .tipo-propia { background: #eaf3de; color: #27500a; }
-  .tipo-alquiler { background: #e6f1fb; color: #0c447c; }
-  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-  .tab { padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid; transition: all 0.15s; }
-  .tab.active { background: var(--forest); color: white; border-color: var(--forest); }
-  .tab.inactive { background: var(--color-background-primary, white); color: var(--forest); border-color: var(--forest); }
-  .pill-counter { background: var(--water-pale); color: var(--water); border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
-  hr { border: none; border-top: 0.5px solid var(--color-border-tertiary, #e8e8e8); margin: 10px 0; }
-</style>
+<div class="container">
+    <h1>El Ceibo</h1>
+    <p style="text-align:center; color: #666;">Control de Náutica y Caja</p>
 
-<h2 class="sr-only">Aplicación de gestión Camping El Ceibo – Isla Santiago</h2>
-
-<div class="app">
-  <div class="header">
-    <div>
-      <div class="header-title">⛺ Camping El Ceibo</div>
-      <div class="header-sub">Isla Santiago</div>
-    </div>
-    <div class="header-date" id="hdr-date"></div>
-  </div>
-
-  <div class="nav">
-    <button class="nav-btn active" onclick="goTab('dashboard')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Tablero
-    </button>
-    <button class="nav-btn" onclick="goTab('nautica')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20 L12 4 L22 20"/><path d="M2 20 h20"/><path d="M12 4 v16"/></svg>
-      Náutica
-    </button>
-    <button class="nav-btn" onclick="goTab('deportes')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3 Q15 7 12 12 Q9 17 12 21"/><path d="M3 12 Q7 9 12 12 Q17 15 21 12"/></svg>
-      Deportes
-    </button>
-    <button class="nav-btn" onclick="goTab('caja')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-      Caja
-    </button>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div class="content active" id="tab-dashboard">
-    <div class="metric-grid">
-      <div class="metric">
-        <div class="metric-label">Ingresos hoy</div>
-        <div class="metric-val green" id="dash-ingresos">$0</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Egresos hoy</div>
-        <div class="metric-val amber" id="dash-egresos">$0</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">En el agua</div>
-        <div class="metric-val blue" id="dash-agua">0</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Canchas activas</div>
-        <div class="metric-val blue" id="dash-canchas">0</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Concesión del Bar
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:13px;">Concesionario: Marcos R.</div>
-          <div style="font-size:11px;color:var(--color-text-secondary,#888);margin-top:2px;">Cuota mensual: $45.000</div>
-        </div>
-        <span class="badge ok" id="bar-status">✓ Al día</span>
-      </div>
-      <hr>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-sm btn-outline" onclick="toggleBar('ok')">Marcar al día</button>
-        <button class="btn btn-sm btn-danger" onclick="toggleBar('warn')">Marcar pendiente</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Alertas de mantenimiento
-      </div>
-      <div id="alertas-list"></div>
-    </div>
-  </div>
-
-  <!-- NAUTICA -->
-  <div class="content" id="tab-nautica">
-    <div class="tabs">
-      <button class="tab active" onclick="setNauticaTab('slots')">Turnos activos</button>
-      <button class="tab inactive" onclick="setNauticaTab('nuevo')">+ Nuevo turno</button>
-    </div>
-
-    <div id="nautica-slots">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div class="section-title" style="margin-bottom:0;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20 L12 4 L22 20"/><path d="M2 20 h20"/></svg>
-          En el agua ahora
-        </div>
-        <span class="pill-counter" id="slots-count">0 activos</span>
-      </div>
-      <div id="slots-container"></div>
-      <div id="slots-empty" style="text-align:center;padding:30px;color:var(--color-text-secondary,#888);font-size:13px;">
-        No hay turnos activos.<br>Usá "Nuevo turno" para registrar.
-      </div>
-    </div>
-
-    <div id="nautica-nuevo" style="display:none;">
-      <div class="card">
-        <div class="section-title">Registrar turno náutico</div>
-        <div class="form-row">
-          <label class="form-label">Nombre del usuario</label>
-          <input class="form-input" id="n-nombre" placeholder="Ej: Juan García" />
-        </div>
-        <div class="two-col">
-          <div class="form-row">
-            <label class="form-label">Actividad</label>
-            <select class="form-select" id="n-actividad">
-              <option value="SUP">SUP</option>
-              <option value="Remo">Remo</option>
-              <option value="Canoa">Canoa</option>
-              <option value="Kayak">Kayak</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label class="form-label">Tipo</label>
-            <select class="form-select" id="n-tipo">
-              <option value="bajada_propia">Bajada Propia</option>
-              <option value="alquiler">Alquiler Equipo</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Precio ($)</label>
-          <input class="form-input" id="n-precio" type="number" placeholder="0" />
-        </div>
-        <button class="btn btn-primary" onclick="agregarSlot()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          Iniciar turno
-        </button>
-      </div>
-      <div style="margin-top:8px;">
-        <div style="font-size:12px;color:var(--color-text-secondary,#888);margin-bottom:6px;">Tarifas sugeridas:</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;">
-          <span class="badge ok">Bajada propia: $1.500</span>
-          <span class="badge" style="background:#e6f1fb;color:#0c447c;">Alquiler SUP: $3.000</span>
-          <span class="badge" style="background:#e6f1fb;color:#0c447c;">Alquiler Canoa: $2.500</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DEPORTES -->
-  <div class="content" id="tab-deportes">
-    <div class="card">
-      <div class="section-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Calendario – Abril 2026
-      </div>
-      <div class="calendar-grid" id="cal-grid"></div>
-    </div>
-
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div class="section-title" style="margin-bottom:0;">Reservar cancha</div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Espacio</label>
-        <select class="form-select" id="d-espacio">
-          <option>Cancha de fútbol</option>
-          <option>Cancha de vóley</option>
-          <option>Área de juegos</option>
-          <option>Quincho</option>
+    <!-- SECCIÓN BAJADA NÁUTICA -->
+    <div class="section">
+        <h2>🚢 Bajada Náutica</h2>
+        <label>Tipo de Embarcación</label>
+        <select id="tipoNautica">
+            <option value="Lancha/Motor">Lancha / Motor</option>
+            <option value="Moto de Agua">Moto de Agua</option>
+            <option value="Velero">Velero</option>
+            <option value="Otro">Otro</option>
         </select>
-      </div>
-      <div class="two-col">
-        <div class="form-row">
-          <label class="form-label">Día (del mes)</label>
-          <input class="form-input" id="d-dia" type="number" min="1" max="30" placeholder="9" />
-        </div>
-        <div class="form-row">
-          <label class="form-label">Hora</label>
-          <select class="form-select" id="d-hora">
-            <option>09:00</option><option>10:00</option><option>11:00</option>
-            <option>14:00</option><option>15:00</option><option>16:00</option>
-            <option>17:00</option><option>18:00</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Nombre del grupo</label>
-        <input class="form-input" id="d-nombre" placeholder="Ej: Familia López" />
-      </div>
-      <button class="btn btn-primary" onclick="reservarCancha()">Confirmar reserva</button>
+        <label>Monto $</label>
+        <input type="number" id="montoNautica" placeholder="Ej: 5000">
+        <button onclick="registrarServicio('Bajada Náutica', 'tipoNautica', 'montoNautica')">Registrar Bajada</button>
     </div>
 
-    <div class="card">
-      <div class="section-title">Reservas del mes</div>
-      <div id="reservas-list"></div>
-      <div id="reservas-empty" style="font-size:13px;color:var(--color-text-secondary,#888);text-align:center;padding:10px;">Sin reservas aún.</div>
-    </div>
-  </div>
-
-  <!-- CAJA -->
-  <div class="content" id="tab-caja">
-    <div class="metric-grid">
-      <div class="metric">
-        <div class="metric-label">Total ingresos</div>
-        <div class="metric-val green" id="caja-ingresos">$0</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Total egresos</div>
-        <div class="metric-val amber" id="caja-egresos">$0</div>
-      </div>
-    </div>
-    <div class="metric" style="margin-bottom:12px;background:var(--color-background-secondary,#f5f5f2);border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div class="metric-label">Ganancia neta del día</div>
-        <div class="metric-val" id="caja-neta" style="color:var(--forest);">$0</div>
-      </div>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d5a27" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-    </div>
-
-    <div class="chart-wrap">
-      <canvas id="cajaChart" role="img" aria-label="Gráfico de barras comparando ingresos vs egresos del día">Comparación ingresos y egresos.</canvas>
-    </div>
-
-    <div class="card">
-      <div class="section-title">Registrar movimiento</div>
-      <div class="tag-row">
-        <button class="tag active" id="tipo-ingreso" onclick="setTipo('ingreso')">Ingreso</button>
-        <button class="tag inactive" id="tipo-egreso" onclick="setTipo('egreso')">Egreso</button>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Descripción</label>
-        <input class="form-input" id="c-desc" placeholder="Ej: Sueldo cuidador / Bajada náutica" />
-      </div>
-      <div class="form-row">
-        <label class="form-label">Monto ($)</label>
-        <input class="form-input" id="c-monto" type="number" placeholder="0" />
-      </div>
-      <div class="form-row">
-        <label class="form-label">Categoría</label>
-        <select class="form-select" id="c-cat">
-          <option>Náutica</option>
-          <option>Deportes</option>
-          <option>Bar / Concesión</option>
-          <option>Sueldos</option>
-          <option>Insumos</option>
-          <option>Mantenimiento</option>
-          <option>Otro</option>
+    <!-- SECCIÓN GUARDERÍA -->
+    <div class="section">
+        <h2>🛶 Guardería (Kayak / SUP)</h2>
+        <label>Equipo</label>
+        <select id="tipoGuarderia">
+            <option value="Kayak Single">Kayak Single</option>
+            <option value="Kayak Doble">Kayak Doble</option>
+            <option value="Tabla SUP">Tabla SUP</option>
+            <option value="Piragua">Piragua</option>
         </select>
-      </div>
-      <button class="btn btn-primary" onclick="registrarMovimiento()">Registrar</button>
+        <label>Monto $</label>
+        <input type="number" id="montoGuarderia" placeholder="Ej: 2000">
+        <button onclick="registrarServicio('Guardería', 'tipoGuarderia', 'montoGuarderia')" style="background-color: #0277bd;">Registrar Guardería</button>
     </div>
 
-    <div class="card">
-      <div class="section-title">Movimientos del día</div>
-      <div id="mov-list-container"></div>
-      <div id="mov-empty" style="font-size:13px;color:var(--color-text-secondary,#888);text-align:center;padding:10px;">Sin movimientos.</div>
+    <!-- RESUMEN DE CAJA -->
+    <div class="resumen">
+        <h2>💰 Caja del Día</h2>
+        <p>Total Recaudado: <strong id="totalCaja">$0</strong></p>
+        <div id="logMovimientos">
+            <!-- Aquí aparecen los registros -->
+        </div>
+        <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar Cierre por WhatsApp</button>
     </div>
-
-    <button class="export-btn" onclick="exportarResumen()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Exportar resumen para WhatsApp
-    </button>
-  </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const state = {
-  slots: [],
-  reservas: [],
-  movimientos: [],
-  barStatus: 'ok',
-  tipoMov: 'ingreso',
-  alertas: [
-    { texto: 'Sueldo cuidador Juan', monto: '$30.000', estado: 'warn', fecha: 'Vence 15 abr' },
-    { texto: 'Revisión bomba de agua', monto: '', estado: 'ok', fecha: 'Realizado 3 abr' },
-    { texto: 'Sueldo limpieza María', monto: '$22.000', estado: 'warn', fecha: 'Vence 15 abr' }
-  ]
-};
+    let total = 0;
+    let movimientos = [];
 
-let cajaChart = null;
+    function registrarServicio(categoria, idDetalle, idMonto) {
+        const detalle = document.getElementById(idDetalle).value;
+        const monto = parseFloat(document.getElementById(idMonto).value);
 
-function fmt(n) {
-  return '$' + Math.round(n).toLocaleString('es-AR');
-}
+        if (isNaN(monto) || monto <= 0) {
+            alert("Por favor, ingresa un monto válido.");
+            return;
+        }
 
-function goTab(id) {
-  document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  const btns = document.querySelectorAll('.nav-btn');
-  const idx = ['dashboard','nautica','deportes','caja'].indexOf(id);
-  if (idx >= 0) btns[idx].classList.add('active');
-  if (id === 'caja') setTimeout(renderChart, 100);
-  if (id === 'dashboard') renderDashboard();
-}
+        // Actualizar Total
+        total += monto;
+        document.getElementById("totalCaja").innerText = "$" + total;
 
-function renderDashboard() {
-  const ingresos = state.movimientos.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
-  const egresos = state.movimientos.filter(m => m.tipo === 'egreso').reduce((s, m) => s + m.monto, 0);
-  document.getElementById('dash-ingresos').textContent = fmt(ingresos);
-  document.getElementById('dash-egresos').textContent = fmt(egresos);
-  document.getElementById('dash-agua').textContent = state.slots.length;
-  document.getElementById('dash-canchas').textContent = state.reservas.filter(r => r.dia == 9).length;
+        // Agregar al Log
+        const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const registro = `${hora} - ${categoria} (${detalle}): $${monto}`;
+        movimientos.push(registro);
 
-  const barEl = document.getElementById('bar-status');
-  if (state.barStatus === 'ok') { barEl.textContent = '✓ Al día'; barEl.className = 'badge ok'; }
-  else { barEl.textContent = '⚠ Pendiente'; barEl.className = 'badge danger'; }
+        const logDiv = document.getElementById("logMovimientos");
+        const p = document.createElement("p");
+        p.className = "log-entry";
+        p.innerText = registro;
+        logDiv.prepend(p);
 
-  const alertList = document.getElementById('alertas-list');
-  alertList.innerHTML = state.alertas.map(a => `
-    <div class="alert-item">
-      <div class="alert-icon ${a.estado}">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${a.estado === 'warn' ? '#ba7517' : '#27500a'}" stroke-width="2">
-          ${a.estado === 'warn' ? '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>' : '<polyline points="20 6 9 17 4 12"/>'}
-        </svg>
-      </div>
-      <div class="alert-text">
-        ${a.texto}${a.monto ? ' – <strong>' + a.monto + '</strong>' : ''}
-        <br><small>${a.fecha}</small>
-      </div>
-      <span class="badge ${a.estado === 'warn' ? 'warn' : 'ok'}">${a.estado === 'warn' ? 'Pendiente' : 'OK'}</span>
-    </div>
-  `).join('');
-}
-
-function toggleBar(st) {
-  state.barStatus = st;
-  renderDashboard();
-}
-
-function setNauticaTab(t) {
-  document.getElementById('nautica-slots').style.display = t === 'slots' ? 'block' : 'none';
-  document.getElementById('nautica-nuevo').style.display = t === 'nuevo' ? 'block' : 'none';
-  document.querySelectorAll('#tab-nautica .tab').forEach((el, i) => {
-    el.className = 'tab ' + ((i === 0 && t === 'slots') || (i === 1 && t === 'nuevo') ? 'active' : 'inactive');
-  });
-}
-
-function agregarSlot() {
-  const nombre = document.getElementById('n-nombre').value.trim();
-  const actividad = document.getElementById('n-actividad').value;
-  const tipo = document.getElementById('n-tipo').value;
-  const precio = parseFloat(document.getElementById('n-precio').value) || 0;
-  if (!nombre) { alert('Ingresá el nombre del usuario'); return; }
-  const slot = { id: Date.now(), nombre, actividad, tipo, precio, hora: new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}) };
-  state.slots.push(slot);
-  document.getElementById('n-nombre').value = '';
-  document.getElementById('n-precio').value = '';
-  renderSlots();
-  setNauticaTab('slots');
-  if (precio > 0) {
-    state.movimientos.push({ tipo: 'ingreso', desc: actividad + ' – ' + nombre, monto: precio, cat: 'Náutica' });
-    renderMovimientos();
-    renderCaja();
-  }
-}
-
-function cerrarSlot(id) {
-  state.slots = state.slots.filter(s => s.id !== id);
-  renderSlots();
-}
-
-function renderSlots() {
-  const container = document.getElementById('slots-container');
-  const empty = document.getElementById('slots-empty');
-  document.getElementById('slots-count').textContent = state.slots.length + ' activos';
-  if (state.slots.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  container.innerHTML = state.slots.map(s => `
-    <div class="card" style="margin-bottom:8px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:14px;font-weight:500;">${s.nombre}</div>
-          <div style="font-size:12px;color:var(--color-text-secondary,#888);margin-top:2px;">${s.actividad} · Desde ${s.hora}</div>
-        </div>
-        <span class="tipo-tag ${s.tipo === 'bajada_propia' ? 'tipo-propia' : 'tipo-alquiler'}">${s.tipo === 'bajada_propia' ? 'Bajada propia' : 'Alquiler'}</span>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
-        <span style="font-size:14px;font-weight:500;color:var(--water);">${fmt(s.precio)}</span>
-        <button class="btn btn-sm btn-danger" onclick="cerrarSlot(${s.id})">Finalizar</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function buildCalendar() {
-  const grid = document.getElementById('cal-grid');
-  const days = ['D','L','M','M','J','V','S'];
-  let html = days.map(d => `<div class="cal-head">${d}</div>`).join('');
-  const offset = 3; // abril 2026 empieza jueves
-  for (let i = 0; i < offset; i++) html += `<div class="cal-day empty"></div>`;
-  for (let d = 1; d <= 30; d++) {
-    const reserved = state.reservas.some(r => r.dia === d);
-    const cls = d === 9 ? 'today' : (reserved ? 'reservado' : 'disponible');
-    html += `<div class="cal-day ${cls}" onclick="clickDay(${d})">${d}</div>`;
-  }
-  grid.innerHTML = html;
-}
-
-function clickDay(d) {
-  document.getElementById('d-dia').value = d;
-}
-
-function reservarCancha() {
-  const espacio = document.getElementById('d-espacio').value;
-  const dia = parseInt(document.getElementById('d-dia').value);
-  const hora = document.getElementById('d-hora').value;
-  const nombre = document.getElementById('d-nombre').value.trim();
-  if (!nombre || !dia) { alert('Completá todos los campos'); return; }
-  state.reservas.push({ espacio, dia, hora, nombre, id: Date.now() });
-  document.getElementById('d-nombre').value = '';
-  document.getElementById('d-dia').value = '';
-  renderReservas();
-  buildCalendar();
-}
-
-function cancelarReserva(id) {
-  state.reservas = state.reservas.filter(r => r.id !== id);
-  renderReservas();
-  buildCalendar();
-}
-
-function renderReservas() {
-  const list = document.getElementById('reservas-list');
-  const empty = document.getElementById('reservas-empty');
-  if (state.reservas.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  list.innerHTML = state.reservas.sort((a,b) => a.dia - b.dia).map(r => `
-    <div class="reserva-item">
-      <div>
-        <div style="font-size:13px;font-weight:500;">${r.espacio}</div>
-        <div style="font-size:11px;color:var(--color-text-secondary,#888);">${r.nombre} · ${r.hora} · Día ${r.dia}</div>
-      </div>
-      <button class="btn btn-sm btn-outline" onclick="cancelarReserva(${r.id})" style="font-size:11px;padding:4px 8px;">Cancelar</button>
-    </div>
-  `).join('');
-  renderDashboard();
-}
-
-function setTipo(t) {
-  state.tipoMov = t;
-  document.getElementById('tipo-ingreso').className = 'tag ' + (t === 'ingreso' ? 'active' : 'inactive');
-  document.getElementById('tipo-egreso').className = 'tag ' + (t === 'egreso' ? 'active' : 'inactive');
-}
-
-function registrarMovimiento() {
-  const desc = document.getElementById('c-desc').value.trim();
-  const monto = parseFloat(document.getElementById('c-monto').value) || 0;
-  const cat = document.getElementById('c-cat').value;
-  if (!desc || !monto) { alert('Completá descripción y monto'); return; }
-  state.movimientos.push({ tipo: state.tipoMov, desc, monto, cat, id: Date.now() });
-  document.getElementById('c-desc').value = '';
-  document.getElementById('c-monto').value = '';
-  renderMovimientos();
-  renderCaja();
-  renderDashboard();
-}
-
-function renderMovimientos() {
-  const container = document.getElementById('mov-list-container');
-  const empty = document.getElementById('mov-empty');
-  if (state.movimientos.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  container.innerHTML = state.movimientos.slice().reverse().map(m => `
-    <div class="mov-item">
-      <div class="mov-left">
-        <div class="mov-icon ${m.tipo}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${m.tipo === 'ingreso' ? '#27500a' : '#791f1f'}" stroke-width="2">
-            ${m.tipo === 'ingreso' ? '<line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>' : '<line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>'}
-          </svg>
-        </div>
-        <div>
-          <div class="mov-desc">${m.desc}</div>
-          <div class="mov-cat">${m.cat}</div>
-        </div>
-      </div>
-      <span class="mov-amount ${m.tipo}">${m.tipo === 'ingreso' ? '+' : '-'}${fmt(m.monto)}</span>
-    </div>
-  `).join('');
-}
-
-function renderCaja() {
-  const ingresos = state.movimientos.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
-  const egresos = state.movimientos.filter(m => m.tipo === 'egreso').reduce((s, m) => s + m.monto, 0);
-  document.getElementById('caja-ingresos').textContent = fmt(ingresos);
-  document.getElementById('caja-egresos').textContent = fmt(egresos);
-  const neta = ingresos - egresos;
-  const netaEl = document.getElementById('caja-neta');
-  netaEl.textContent = fmt(neta);
-  netaEl.style.color = neta >= 0 ? 'var(--forest)' : '#a32d2d';
-  renderDashboard();
-  renderChart();
-}
-
-function renderChart() {
-  const cats = ['Náutica','Deportes','Bar / Concesión','Sueldos','Insumos','Mantenimiento','Otro'];
-  const ingrData = cats.map(c => state.movimientos.filter(m => m.tipo === 'ingreso' && m.cat === c).reduce((s,m) => s+m.monto, 0));
-  const egrData = cats.map(c => state.movimientos.filter(m => m.tipo === 'egreso' && m.cat === c).reduce((s,m) => s+m.monto, 0));
-  const hasData = ingrData.some(v=>v>0) || egrData.some(v=>v>0);
-  const labels = hasData ? cats.filter((_,i) => ingrData[i]>0 || egrData[i]>0) : ['Sin datos'];
-  const ingr = hasData ? ingrData.filter((_,i) => ingrData[i]>0 || egrData[i]>0) : [0];
-  const egr = hasData ? egrData.filter((_,i) => ingrData[i]>0 || egrData[i]>0) : [0];
-
-  if (cajaChart) { cajaChart.destroy(); cajaChart = null; }
-  const ctx = document.getElementById('cajaChart');
-  if (!ctx) return;
-  cajaChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Ingresos', data: ingr, backgroundColor: '#3d7a35', borderRadius: 4 },
-        { label: 'Egresos', data: egr, backgroundColor: '#e24b4a', borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-        y: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { font: { size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'k' } }
-      }
+        // Limpiar input de monto
+        document.getElementById(idMonto).value = "";
     }
-  });
-}
 
-function exportarResumen() {
-  const d = new Date();
-  const fecha = d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  const ingresos = state.movimientos.filter(m => m.tipo === 'ingreso').reduce((s,m) => s+m.monto, 0);
-  const egresos = state.movimientos.filter(m => m.tipo === 'egreso').reduce((s,m) => s+m.monto, 0);
-  const neta = ingresos - egresos;
-  let txt = `🏕 *CAMPING EL CEIBO – Resumen del día*\n`;
-  txt += `📅 ${fecha}\n\n`;
-  txt += `💰 *CAJA*\n`;
-  txt += `Ingresos: ${fmt(ingresos)}\n`;
-  txt += `Egresos: ${fmt(egresos)}\n`;
-  txt += `Ganancia neta: *${fmt(neta)}*\n\n`;
-  if (state.movimientos.length > 0) {
-    txt += `📋 *MOVIMIENTOS*\n`;
-    state.movimientos.forEach(m => {
-      txt += `${m.tipo === 'ingreso' ? '▲' : '▼'} ${m.desc} (${m.cat}): ${m.tipo === 'ingreso' ? '+' : '-'}${fmt(m.monto)}\n`;
-    });
-    txt += '\n';
-  }
-  txt += `⛵ *NÁUTICA*\n`;
-  txt += `Turnos del día: ${state.slots.length} activos\n\n`;
-  txt += `🏟 *DEPORTES*\n`;
-  txt += `Reservas hoy: ${state.reservas.filter(r => r.dia === 9).length}\n\n`;
-  txt += `🍺 *BAR*\n`;
-  txt += `Estado concesión: ${state.barStatus === 'ok' ? '✅ Al día' : '⚠️ Pendiente'}\n`;
-  txt += `\n_Generado por app Camping El Ceibo_`;
-  navigator.clipboard.writeText(txt).then(() => {
-    alert('✅ Resumen copiado al portapapeles.\nPegalo en WhatsApp directamente.');
-  }).catch(() => {
-    prompt('Copiá este texto para WhatsApp:', txt);
-  });
-}
+    function enviarWhatsApp() {
+        if (movimientos.length === 0) {
+            alert("No hay movimientos registrados hoy.");
+            return;
+        }
+        
+        let mensaje = `*CIERRE DE CAJA - CAMPING EL CEIBO*%0A`;
+        mensaje += `---------------------------------%0A`;
+        movimientos.forEach(m => {
+            mensaje += m + `%0A`;
+        });
+        mensaje += `---------------------------------%0A`;
+        mensaje += `*TOTAL FINAL: $${total}*`;
 
-const hdrDate = document.getElementById('hdr-date');
-const now = new Date();
-hdrDate.innerHTML = now.toLocaleDateString('es-AR', {day:'numeric', month:'short'}) + '<br>' + now.toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
-
-buildCalendar();
-renderSlots();
-renderReservas();
-renderDashboard();
+        const url = `https://wa.me/?text=${mensaje}`;
+        window.open(url, '_blank');
+    }
 </script>
+
+</body>
+</html>
