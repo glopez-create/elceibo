@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camping El Ceibo - Gestión</title>
+    <title>Camping El Ceibo - Gestión Náutica</title>
     <style>
         body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; }
         .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2e7d32; margin-bottom: 5px; }
-        h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; color: #333; }
-        .section { margin-bottom: 25px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; }
+        h1 { text-align: center; color: #0277bd; margin-bottom: 5px; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; color: #333; font-size: 1.2em; }
+        .section { margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        select, input, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
-        button { background-color: #2e7d32; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:active { background-color: #1b5e20; }
-        .resumen { background: #e8f5e9; padding: 15px; border-radius: 8px; }
-        .log-entry { font-size: 14px; border-bottom: 1px solid #ddd; padding: 5px 0; }
+        select, input, button { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        button { background-color: #0277bd; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:active { background-color: #01579b; }
+        .resumen { background: #e1f5fe; padding: 15px; border-radius: 8px; border: 1px solid #81d4fa; }
+        .log-entry { font-size: 14px; border-bottom: 1px solid #ddd; padding: 5px 0; margin: 0; }
         .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
     </style>
 </head>
@@ -23,26 +23,26 @@
 
 <div class="container">
     <h1>El Ceibo</h1>
-    <p style="text-align:center; color: #666;">Control de Náutica y Caja</p>
+    <p style="text-align:center; color: #666;">Control de Náutica</p>
 
     <!-- SECCIÓN BAJADA NÁUTICA -->
     <div class="section">
         <h2>🚢 Bajada Náutica</h2>
-        <label>Tipo de Embarcación</label>
+        <label>Embarcación</label>
         <select id="tipoNautica">
             <option value="Lancha/Motor">Lancha / Motor</option>
             <option value="Moto de Agua">Moto de Agua</option>
             <option value="Velero">Velero</option>
-            <option value="Otro">Otro</option>
+            <option value="Semi-rígido">Semi-rígido</option>
         </select>
         <label>Monto $</label>
         <input type="number" id="montoNautica" placeholder="Ej: 5000">
-        <button onclick="registrarServicio('Bajada Náutica', 'tipoNautica', 'montoNautica')">Registrar Bajada</button>
+        <button onclick="registrar('Náutica', 'tipoNautica', 'montoNautica')">Registrar Bajada</button>
     </div>
 
     <!-- SECCIÓN GUARDERÍA -->
     <div class="section">
-        <h2>🛶 Guardería (Kayak / SUP)</h2>
+        <h2>🛶 Guardería (Kayak/SUP)</h2>
         <label>Equipo</label>
         <select id="tipoGuarderia">
             <option value="Kayak Single">Kayak Single</option>
@@ -51,71 +51,10 @@
             <option value="Piragua">Piragua</option>
         </select>
         <label>Monto $</label>
-        <input type="number" id="montoGuarderia" placeholder="Ej: 2000">
-        <button onclick="registrarServicio('Guardería', 'tipoGuarderia', 'montoGuarderia')" style="background-color: #0277bd;">Registrar Guardería</button>
+        <input type="number" id="montoGuarderia" placeholder="Ej: 1500">
+        <button onclick="registrar('Guardería', 'tipoGuarderia', 'montoGuarderia')" style="background-color: #ef6c00;">Registrar Guardería</button>
     </div>
 
     <!-- RESUMEN DE CAJA -->
     <div class="resumen">
-        <h2>💰 Caja del Día</h2>
-        <p>Total Recaudado: <strong id="totalCaja">$0</strong></p>
-        <div id="logMovimientos">
-            <!-- Aquí aparecen los registros -->
-        </div>
-        <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar Cierre por WhatsApp</button>
-    </div>
-</div>
-
-<script>
-    let total = 0;
-    let movimientos = [];
-
-    function registrarServicio(categoria, idDetalle, idMonto) {
-        const detalle = document.getElementById(idDetalle).value;
-        const monto = parseFloat(document.getElementById(idMonto).value);
-
-        if (isNaN(monto) || monto <= 0) {
-            alert("Por favor, ingresa un monto válido.");
-            return;
-        }
-
-        // Actualizar Total
-        total += monto;
-        document.getElementById("totalCaja").innerText = "$" + total;
-
-        // Agregar al Log
-        const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const registro = `${hora} - ${categoria} (${detalle}): $${monto}`;
-        movimientos.push(registro);
-
-        const logDiv = document.getElementById("logMovimientos");
-        const p = document.createElement("p");
-        p.className = "log-entry";
-        p.innerText = registro;
-        logDiv.prepend(p);
-
-        // Limpiar input de monto
-        document.getElementById(idMonto).value = "";
-    }
-
-    function enviarWhatsApp() {
-        if (movimientos.length === 0) {
-            alert("No hay movimientos registrados hoy.");
-            return;
-        }
-        
-        let mensaje = `*CIERRE DE CAJA - CAMPING EL CEIBO*%0A`;
-        mensaje += `---------------------------------%0A`;
-        movimientos.forEach(m => {
-            mensaje += m + `%0A`;
-        });
-        mensaje += `---------------------------------%0A`;
-        mensaje += `*TOTAL FINAL: $${total}*`;
-
-        const url = `https://wa.me/?text=${mensaje}`;
-        window.open(url, '_blank');
-    }
-</script>
-
-</body>
-</html>
+        <h2>💰
