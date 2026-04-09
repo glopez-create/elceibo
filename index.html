@@ -3,58 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camping El Ceibo - Gestión Náutica</title>
+    <title>Camping El Ceibo - Gestión Integral</title>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #0277bd; margin-bottom: 5px; }
-        h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; color: #333; font-size: 1.2em; }
-        .section { margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        select, input, button { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
-        button { background-color: #0277bd; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:active { background-color: #01579b; }
-        .resumen { background: #e1f5fe; padding: 15px; border-radius: 8px; border: 1px solid #81d4fa; }
-        .log-entry { font-size: 14px; border-bottom: 1px solid #ddd; padding: 5px 0; margin: 0; }
-        .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
+        body { font-family: sans-serif; margin: 0; padding: 15px; background-color: #f4f4f9; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1b5e20; margin-bottom: 5px; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; color: #333; font-size: 1.1em; margin-top: 0; }
+        .section { margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
+        select, input, button { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        
+        /* Colores por sección */
+        .btn-nautica { background-color: #0277bd; color: white; border: none; font-weight: bold; }
+        .btn-guarderia { background-color: #ef6c00; color: white; border: none; font-weight: bold; }
+        .btn-admin { background-color: #455a64; color: white; border: none; font-weight: bold; }
+        .btn-concesion { background-color: #6a1b9a; color: white; border: none; font-weight: bold; }
+        
+        button:active { opacity: 0.8; }
+        
+        .resumen { background: #fffde7; padding: 15px; border-radius: 8px; border: 1px solid #fbc02d; margin-top: 20px; }
+        .log-entry { font-size: 13px; border-bottom: 1px solid #ddd; padding: 5px 0; margin: 0; color: #444; }
+        .btn-whatsapp { background-color: #25d366; color: white; border: none; font-weight: bold; margin-top: 10px; }
+        
+        .total-number { font-size: 1.4em; color: #d32f2f; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>El Ceibo</h1>
-    <p style="text-align:center; color: #666;">Control de Náutica</p>
+    <p style="text-align:center; color: #666; margin-top:0;">Gestión de Camping y Náutica</p>
 
-    <!-- SECCIÓN BAJADA NÁUTICA -->
-    <div class="section">
+    <!-- BAJADA NÁUTICA -->
+    <div class="section" style="border-left: 5px solid #0277bd;">
         <h2>🚢 Bajada Náutica</h2>
-        <label>Embarcación</label>
         <select id="tipoNautica">
             <option value="Lancha/Motor">Lancha / Motor</option>
             <option value="Moto de Agua">Moto de Agua</option>
-            <option value="Velero">Velero</option>
-            <option value="Semi-rígido">Semi-rígido</option>
+            <option value="Velero/Semi">Velero o Semi-rígido</option>
         </select>
-        <label>Monto $</label>
-        <input type="number" id="montoNautica" placeholder="Ej: 5000">
-        <button onclick="registrar('Náutica', 'tipoNautica', 'montoNautica')">Registrar Bajada</button>
+        <input type="number" id="montoNautica" placeholder="Monto $">
+        <button class="btn-nautica" onclick="registrar('Náutica', 'tipoNautica', 'montoNautica')">Registrar Bajada</button>
     </div>
 
-    <!-- SECCIÓN GUARDERÍA -->
-    <div class="section">
+    <!-- GUARDERÍA -->
+    <div class="section" style="border-left: 5px solid #ef6c00;">
         <h2>🛶 Guardería (Kayak/SUP)</h2>
-        <label>Equipo</label>
         <select id="tipoGuarderia">
             <option value="Kayak Single">Kayak Single</option>
             <option value="Kayak Doble">Kayak Doble</option>
             <option value="Tabla SUP">Tabla SUP</option>
-            <option value="Piragua">Piragua</option>
         </select>
-        <label>Monto $</label>
-        <input type="number" id="montoGuarderia" placeholder="Ej: 1500">
-        <button onclick="registrar('Guardería', 'tipoGuarderia', 'montoGuarderia')" style="background-color: #ef6c00;">Registrar Guardería</button>
+        <input type="number" id="montoGuarderia" placeholder="Monto $">
+        <button class="btn-guarderia" onclick="registrar('Guardería', 'tipoGuarderia', 'montoGuarderia')">Registrar Guardería</button>
     </div>
 
-    <!-- RESUMEN DE CAJA -->
+    <!-- CONCESIÓN / PROVEEDORES -->
+    <div class="section" style="border-left: 5px solid #6a1b9a;">
+        <h2>🛒 Concesión y Compras</h2>
+        <select id="tipoConcesion">
+            <option value="Gasto Mercadería">Compra Mercadería</option>
+            <option value="Cobro Canon">Cobro Canon Concesión</option>
+            <option value="Art. Limpieza">Artículos Limpieza</option>
+            <option value="Otros">Otros Gastos</option>
+        </select>
+        <input type="number" id="montoConcesion" placeholder="Monto $">
+        <button class="btn-concesion" onclick="registrar('Concesión', 'tipoConcesion', 'montoConcesion')">Registrar Movimiento</button>
+    </div>
+
+    <!-- CAJA Y EMPLEADOS -->
+    <div class="section" style="border-left: 5px solid #455a64;">
+        <h2>👥 Administración y Personal</h2>
+        <select id="tipoAdmin">
+            <option value="Pago Sueldo">Pago Sueldo/Jornal</option>
+            <option value="Vale Empleado">Vale Empleado</option>
+            <option value="Caja Inicial">Ingreso Caja Inicial</option>
+            <option value="Retiro Caja">Retiro de Efectivo</option>
+        </select>
+        <input type="number" id="montoAdmin" placeholder="Monto $">
+        <button class="btn-admin" onclick="registrar('Admin', 'tipoAdmin', 'montoAdmin')">Registrar Admin</button>
+    </div>
+
+    <!-- CIERRE DE CAJA -->
     <div class="resumen">
-        <h2>💰
+        <h2>💰 Estado de Caja</h2>
+        <p>Saldo Actual: <strong class="total-number" id="totalCaja">$0</strong></p>
+        <div id="logMovimientos" style="max-height: 200px; overflow-y: auto; background: white; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+            <!-- Aquí aparecen los registros -->
+        </div>
+        <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar Informe Diario</button>
+    </div>
+</div>
+
+<script>
+    let total = 0;
+    let movimientos = [];
+
+    function registrar(categoria, idDetalle, idMonto) {
+        const detalle = document.getElementById(idDetalle).value;
+        const inputMonto = document.getElementById(idMonto);
+        let monto = parseFloat(inputMonto.value);
+
+        if (isNaN(monto) || monto === 0) {
+            alert("Por favor, ingresa un monto válido.");
+            return;
+        }
+
+        // Si es un pago o retiro (egreso), restamos del total
+        if (detalle.includes("Pago") || detalle.includes("Vale") || detalle.includes("Gasto") || detalle.includes("Retiro") || detalle.includes("Limpieza")) {
+            total -= Math.abs(monto);
+            monto = -Math.abs(monto); // Lo guardamos como negativo
+        } else {
+            total += Math.abs(monto);
+            monto = Math.abs(monto);
+        }
+
+        document.getElementById("totalCaja").innerText = "$" + total;
+
+        const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const registro = `${hora} - ${categoria}: ${detalle} ($${monto})`;
+        movimientos.push(registro);
+
+        const logDiv = document.getElementById("logMovimientos");
+        const p = document.createElement("p");
+        p.className = "log-entry";
+        p.innerText = registro;
+        logDiv.prepend(p);
+
+        inputMonto.value = "";
+    }
+
+    function enviarWhatsApp() {
+        if (movimientos.length === 0) {
+            alert("No hay movimientos registrados.");
+            return;
+        }
+        
+        let mensaje = `*INFORME EL CEIBO - ${new Date().toLocaleDateString()}*%0A`;
+        mensaje += `---------------------------------%0A`;
+        movimientos.forEach(m => { mensaje += m + `%0A`; });
+        mensaje += `---------------------------------%0A`;
+        mensaje += `*SALDO TOTAL EN CAJA: $${total}*`;
+
+        window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+    }
+</script>
+
+</body>
+</html>
